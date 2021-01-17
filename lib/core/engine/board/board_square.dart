@@ -1,4 +1,7 @@
 class BoardSquare {
+  static const List<String> _columnNames =
+      ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
   final int row;
   final int column;
 
@@ -56,5 +59,10 @@ class BoardSquare {
           throw Exception('Cannot convert $columnChar to column value');
         }
     }
+  }
+
+  @override
+  String toString() {
+    return '${_columnNames[column]}$row';
   }
 }

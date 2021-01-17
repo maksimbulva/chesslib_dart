@@ -38,10 +38,6 @@ class Board {
     return _cells[_encodeBoardSquare(boardSquare)];
   }
 
-  // List<ColoredPiece> enumerateSquares() {
-  //   return _cells;
-  // }
-
   BoardSquare? getKingBoardSquare(Player player) {
     // TODO: optimize me
     for (var i = 0; i < _cells.length; ++i) {
