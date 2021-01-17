@@ -25,8 +25,36 @@ class MoveGenerator {
     Vector2(-2, 1),
     Vector2(2, 1),
     Vector2(-1, 2),
-    Vector2(1, 2),
+    Vector2(1, 2)
   ];
+
+  static final List<Vector2> _kingDeltas = [
+    Vector2(-1, -1),
+    Vector2(0, -1),
+    Vector2(1, -1),
+    Vector2(-1, 0),
+    Vector2(1, 0),
+    Vector2(-1, 1),
+    Vector2(0, 1),
+    Vector2(1, 1)
+  ];
+
+  static final List<Vector2> _bishopRayDeltas = [
+    Vector2(-1, -1),
+    Vector2(-1, 1),
+    Vector2(1, -1),
+    Vector2(1, 1)
+  ];
+
+  static final List<Vector2> _rookRayDeltas = [
+    Vector2(-1, 0),
+    Vector2(0, -1),
+    Vector2(0, 1),
+    Vector2(1, 0)
+  ];
+
+  static final List<Vector2> _queenRayDeltas =
+      _bishopRayDeltas + _rookRayDeltas;
 
   List<Move> generateMoves(Position position) {
     final legalMoves = List<Move>.empty(growable: true);
@@ -71,6 +99,22 @@ class MoveGenerator {
           }
           case Piece.Knight: {
             _appendMovesFromDeltas(fromSquare, _knightDeltas, position, moves);
+            break;
+          }
+          case Piece.Bishop: {
+            _appendRayMoves(fromSquare, _bishopRayDeltas, position, moves);
+            break;
+          }
+          case Piece.Rook: {
+            _appendRayMoves(fromSquare, _rookRayDeltas, position, moves);
+            break;
+          }
+          case Piece.Queen: {
+            _appendRayMoves(fromSquare, _queenRayDeltas, position, moves);
+            break;
+          }
+          case Piece.King: {
+            _appendMovesFromDeltas(fromSquare, _kingDeltas, position, moves);
             break;
           }
         }
@@ -159,6 +203,30 @@ class MoveGenerator {
       if (!position.board.isOccupiedByPlayer(
           destSquare, position.playerToMove)) {
         moves.add(Move.byCoordinates(fromSquare, destSquare));
+      }
+    }
+  }
+
+  void _appendRayMoves(
+      BoardSquare fromSquare,
+      List<Vector2> rayDeltas,
+      Position position,
+      List<Move> moves
+  ) {
+    final board = position.board;
+    for (final rayDelta in rayDeltas) {
+      var currentSquare = rayDelta + fromSquare;
+      while (currentSquare != null) {
+        final pieceOnCurrentSquare = board.getPieceAt(currentSquare);
+        if (pieceOnCurrentSquare == null) {
+          moves.add(Move.byCoordinates(fromSquare, currentSquare));
+        } else if (pieceOnCurrentSquare.player != position.playerToMove) {
+          moves.add(Move.byCoordinates(fromSquare, currentSquare));
+          break;
+        } else {
+          break;
+        }
+        currentSquare = rayDelta + currentSquare;
       }
     }
   }

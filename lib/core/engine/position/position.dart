@@ -56,7 +56,7 @@ class Position {
     }
 
     return Position(
-        board,
+        board.playMove(move, playerToMove),
         getOtherPlayer(playerToMove),
         newWhiteCastlingAvailability,
         newBlackCastlingAvailability,

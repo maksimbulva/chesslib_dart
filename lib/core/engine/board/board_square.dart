@@ -63,6 +63,6 @@ class BoardSquare {
 
   @override
   String toString() {
-    return '${_columnNames[column]}$row';
+    return '${_columnNames[column]}${row + 1}';
   }
 }

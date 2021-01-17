@@ -6,9 +6,10 @@ import 'package:test/test.dart';
 void main() {
   test('moveCountFromInitialPosition', () {
     final position = FenDecoder().decode(
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
     expect(_countMoves(position, 1), 20);
     expect(_countMoves(position, 2), 400);
+    expect(_countMoves(position, 3), 8902);
   });
 }
 
