@@ -22,3 +22,6 @@ doc/api/
 
 .idea/
 *.iml
+/.flutter-plugins-dependencies
+/.flutter-plugins
+/.metadata
