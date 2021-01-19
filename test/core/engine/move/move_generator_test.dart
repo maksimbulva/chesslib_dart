@@ -10,6 +10,8 @@ void main() {
     expect(_countMoves(position, 1), 20);
     expect(_countMoves(position, 2), 400);
     expect(_countMoves(position, 3), 8902);
+    expect(_countMoves(position, 4), 197281);
+    expect(_countMoves(position, 5), 4865609);
   });
 }
 

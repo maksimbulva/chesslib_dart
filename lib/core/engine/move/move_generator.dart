@@ -62,7 +62,7 @@ class MoveGenerator {
       final newPosition = position.playMove(move);
       final myKingBoardSquare =
         newPosition.board.getKingBoardSquare(position.playerToMove);
-      if (myKingBoardSquare != null && !isAttacksCell(
+      if (myKingBoardSquare != null && !isAttacksSquare(
           newPosition,
           newPosition.playerToMove,
           myKingBoardSquare
@@ -73,10 +73,79 @@ class MoveGenerator {
     return legalMoves;
   }
 
-  bool isAttacksCell(
+  bool isAttacksSquare(
       Position position,
       Player attacker,
-      BoardSquare targetCell) {
+      BoardSquare targetSquare
+  ) {
+    // TODO: optimize me
+    final board = position.board;
+    for (var row = 0; row < Board.ROW_COUNT; ++row) {
+      for (var column = Board.COLUMN_A; column <= Board.COLUMN_H; ++column) {
+        final coloredPiece = board.getPieceAtCoordinates(row, column);
+        if (coloredPiece == null || coloredPiece.player != attacker) {
+          continue;
+        }
+        final fromSquare = BoardSquare(row, column);
+        final moveDelta = Vector2.fromBoardSquares(fromSquare, targetSquare);
+        switch (coloredPiece.piece) {
+          case Piece.Pawn: {
+            if (_isPawnAttack(moveDelta, position.playerToMove)) {
+              return true;
+            }
+            break;
+          }
+          case Piece.Knight: {
+            if (_isKnightAttack(moveDelta)) {
+              return true;
+            }
+            break;
+          }
+          case Piece.Bishop: {
+            if (_isBishopAttack(moveDelta) &&
+                _isRayAttack(
+                    fromSquare,
+                    targetSquare,
+                    board,
+                    _toUnitLength(moveDelta))
+            ) {
+              return true;
+            }
+            break;
+          }
+          case Piece.Rook: {
+            if (_isRookAttack(moveDelta) &&
+                _isRayAttack(
+                    fromSquare,
+                    targetSquare,
+                    board,
+                    _toUnitLength(moveDelta))
+            ) {
+              return true;
+            }
+            break;
+          }
+          case Piece.Queen: {
+            if (_isQueenAttack(moveDelta) &&
+                _isRayAttack(
+                    fromSquare,
+                    targetSquare,
+                    board,
+                    _toUnitLength(moveDelta))
+            ) {
+              return true;
+            }
+            break;
+          }
+          case Piece.King: {
+            if (_isKingAttack(moveDelta)) {
+              return true;
+            }
+            break;
+          }
+        }
+      }
+    }
     return false;
   }
 
@@ -229,5 +298,60 @@ class MoveGenerator {
         currentSquare = rayDelta + currentSquare;
       }
     }
+  }
+
+  bool _isPawnAttack(Vector2 moveDelta, Player attacker) {
+    if (moveDelta.deltaColumn.abs() != 1) {
+      return false;
+    }
+    if (attacker == Player.Black) {
+      return moveDelta.deltaRow == -1;
+    } else {
+      return moveDelta.deltaRow == 1;
+    }
+  }
+
+  bool _isKnightAttack(Vector2 moveDelta) {
+    // TODO: optimize me (precompute abs values)
+    final deltaRowAbs =  moveDelta.deltaRow.abs();
+    final deltaColumnAbs = moveDelta.deltaColumn.abs();
+    return ((deltaRowAbs == 2 && deltaColumnAbs == 1) ||
+        (deltaRowAbs == 1 && deltaColumnAbs == 2));
+  }
+
+  bool _isBishopAttack(Vector2 moveDelta) {
+    return moveDelta.deltaRow.abs() == moveDelta.deltaColumn.abs();
+  }
+
+  bool _isRookAttack(Vector2 moveDelta) {
+    return moveDelta.deltaRow == 0 || moveDelta.deltaColumn == 0;
+  }
+
+  bool _isQueenAttack(Vector2 moveDelta) {
+    return _isBishopAttack(moveDelta) || _isRookAttack(moveDelta);
+  }
+
+  bool _isKingAttack(Vector2 moveDelta) {
+    return moveDelta.deltaRow.abs() <= 1 && moveDelta.deltaColumn.abs() <= 1;
+  }
+
+  bool _isRayAttack(
+      BoardSquare fromSquare,
+      BoardSquare targetSquare,
+      Board board,
+      Vector2 rayDelta
+  ) {
+    var currentSquare = rayDelta + fromSquare;
+    while (currentSquare != null && !currentSquare.isEquals(targetSquare)) {
+      if (!board.isEmpty(currentSquare)) {
+        return false;
+      }
+      currentSquare = rayDelta + currentSquare;
+    }
+    return true;
+  }
+
+  static Vector2 _toUnitLength(Vector2 moveDelta) {
+    return Vector2(moveDelta.deltaRow.sign, moveDelta.deltaColumn.sign);
   }
 }

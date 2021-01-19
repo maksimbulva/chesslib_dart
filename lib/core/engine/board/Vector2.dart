@@ -7,6 +7,9 @@ class Vector2 {
 
   Vector2(this.deltaRow, this.deltaColumn);
 
+  Vector2.fromBoardSquares(BoardSquare origin, BoardSquare dest)
+    : this(dest.row - origin.row, dest.column - origin.column);
+
   BoardSquare? operator +(BoardSquare boardSquare) {
     final resultRow = boardSquare.row + deltaRow;
     if (resultRow < 0 || resultRow >= Board.ROW_COUNT) {
